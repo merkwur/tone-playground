@@ -37,9 +37,9 @@ const NodeCanvasComponent = () => {
                                        searchBoxPosition.x, searchBoxPosition.y,
                                        type,
                                        [],
+                                       [], 
+                                       null,
                                        [],
-                                       [],
-                                       null,  
                                        nodesData, 0); 
       setNodesData(updatedNodesData); 
       console.log(updatedNodesData)

@@ -45,7 +45,7 @@ export const menuContent = {
     // 'MonoSynth',
     'NoiseSynth',
     'PluckSynth',
-    'PolySynth',
+    // 'PolySynth',
     // 'Sampler',
     'Synth',
   ],

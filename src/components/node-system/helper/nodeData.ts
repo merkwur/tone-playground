@@ -45,7 +45,7 @@ export const addNode = (
   type: string,
   connectedTo: string[],
   output: any,
-  params: NodeParams | any = getDefaultParams(name),
+  params: NodeParams | null = getDefaultParams(name),
   lines: [] | null,
   nodes: Nodes[],
   ticks: number,
