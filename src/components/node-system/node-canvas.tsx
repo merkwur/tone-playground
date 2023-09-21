@@ -14,7 +14,7 @@ import {addNode,
         
         
         } from "./helper/nodeData"
-
+import { innerText } from './helper/innerText';
 import Canvas from './canvas/canvas';
 
 
@@ -23,6 +23,7 @@ const NodeCanvasComponent = () => {
   const [nodesData, setNodesData] = useState<Nodes[]>([]);
   const [lineData, setLineData] = useState<Lines[]>([])
   const [menu, setMenu] = useState<boolean>(false)
+  const [info, setInfo] = useState<boolean>(false)
 
   const [searchBoxPosition, setSearchBoxPosition] = useState<{x: number, y: number}>({} as any)
   
@@ -158,6 +159,53 @@ const NodeCanvasComponent = () => {
             deleteLine={(lineID) => handleLineDelete(lineID)}
             
           />
+          <div 
+              className='info-icon'
+              style={{position: "absolute", 
+                      top: "15px", 
+                      left: "15px",
+                      backgroundColor: "#25494442",
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "50%",
+                      cursor: "help"
+                    }}
+              onClick={() => setInfo(!info)}
+          
+          > <div 
+              className='info-text'
+              style={{
+                      position: "absolute", 
+                      top: "-15px", 
+                      left: "2px",
+                      color: "#181818",
+                      fontSize: "48pt"
+                      
+
+              }}
+          > ? </div> </div>
+          { info ? (
+              <div 
+                  className='information'
+                  style={{position: "absolute", 
+                          top: "40px", 
+                          left: "50px",
+                          backgroundColor: "#fafa42",
+                          width: "380px",
+                          height: "320px",
+                          borderRadius: "5%",
+                          fontSize: "8pt",
+                          color: "#424242",
+                          fontWeight: "500",
+                          paddingTop: "20px",
+                          paddingLeft: "10px",
+                          paddingRight: "10px",
+                          whiteSpace: 'pre-line'
+                }}
+              > {innerText} </div>
+          ) : null 
+
+          }
         </div>
 
   );

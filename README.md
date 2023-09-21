@@ -1,27 +1,13 @@
-# React + TypeScript + Vite
+# Tone.JS Playground
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Easy to develope synthesizer on a browser.
 
-Currently, two official plugins are available:
+ - *Right click on a canvas opens a menu*
+ - *Left click on an element on the menu selects and craetes the node from element*
+ - *In order to create a sound one must crete a destination node. And the destination node must be the last element in the tree. And must have a connetion. Single connection is better than multiple connection. To handling the multiple connetions use the gain node*
+ - *All the right bottom squares are output the sockets*
+ - *All the left side sockets are the inputs*
+ - *Connections can only be crated via dragging the mouse from output to any input -for now.- The line will appear after if the connection is valid.*
+ - *There are minor and major multiple bugs that are exists* 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
