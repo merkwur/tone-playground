@@ -1,34 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import './node.scss';
 import { Nodes, addConnection, Lines } from '../helper/nodeData';
 import Source from '../nodes/source/source';
 import Core from '../nodes/core/core';
-import Instrument from '../nodes/instrument/instrument';
-import Sequencer from '../nodes/core/sequencer/sequencer';
-import Quantizer from '../nodes/core/quantizer/quantizer';
 import Effects from '../nodes/effects/effects';
 import Signal from '../nodes/signal/signal';
 import SignalTone from '../nodes/signal/signalTone';
 import Component from '../nodes/component/component';
-import { NodeParams } from '../helper/types';
+// import { NodeParams } from '../helper/types';
 import Transport from '../nodes/core/clock/transport';
 import Synth from '../nodes/synths/synth';
 
 
 
 interface NodeProps {
-  node: { id: string;
-          name: string,
-          x: number,
-          y: number,
-          type: string,
-          connectedTo: [],
-          input: {},
-          params: NodeParams,
-          lines: [],
-          nodes: Nodes[],
-          Tone: {} 
-  }
+  node: any
   position: { x: number; y: number };
   onDelete: () => void;
   nodeData: Nodes[];
@@ -64,17 +50,17 @@ const Node: React.FC<NodeProps> = ({
   const [fromNode, setFromNode] = useState<HTMLDivElement | null>(null);
   const [initialX, setInitialX] = useState<number | null>(null);
   const [initialY, setInitialY] = useState<number | null>(null);
-  const [currentID, setCurrentID] = useState<string | null>(null)
+  const [currentID, setCurrentID] = useState<string>(node.id)
 
-  const nodeRefs = useRef({}); // Initialize an empty object to store node refs
+  const nodeRefs = useRef({}) as any; // Initialize an empty object to store node refs
 
-  const handleMouseDown = (event: MouseEvent, nodeId: string) => {
+  const handleMouseDown = (event: MouseEvent<HTMLDivElement, MouseEvent> | any, nodeId: string) => {
     const dragFromElement = document.elementFromPoint(event.clientX, event.clientY);
     
     setCurrentID(nodeId)
     if (dragFromElement?.className === 'output') {
       setIsEdgeDragging(true);
-      setFromNode(dragFromElement);
+      setFromNode(dragFromElement as any);
     } else {
       const nodeElement = nodeRefs.current[nodeId]; // Use the node reference from nodeRefs
       
@@ -97,7 +83,7 @@ const Node: React.FC<NodeProps> = ({
     onDelete(); // Call the onDelete prop to trigger node deletion
   };
 
-  const handleMouseMove = (event: MouseEvent) => {
+  const handleMouseMove = (event: MouseEvent | any) => {
     
     if (isDragging && diff.x < (node.params ? Object.keys(node.params).length * 35 + 80 *.8 
                                 : node.name === "Transport" ? 280 : 120) && diff.y < 20) {
@@ -119,10 +105,12 @@ const Node: React.FC<NodeProps> = ({
     }
   };
 
-  const handleMouseUp = (event: MouseEvent) => {
+  const handleMouseUp = (event: MouseEvent | any) => {
     const dragEndElement = document.elementFromPoint(event.clientX, event.clientY);
+    
+    if (dragEndElement && dragEndElement.className === 'input' && 'title' in dragEndElement){
+      const title = dragEndElement.title as string; // Use type assertion to specify it's a string
 
-    if (dragEndElement && dragEndElement.className === 'input' ){
       const connectionType = dragEndElement.id.includes("input") ? "node2node" : "node2param" 
       console.log(connectionType)
       console.log('Drag ended over a div element:', dragEndElement?.id);
@@ -138,15 +126,15 @@ const Node: React.FC<NodeProps> = ({
           );
         } else {
           addConnection(
-            fromNode?.title!,
-            dragEndElement?.title,
+            fromNode?.title,
+            title,
             connectionType,
             nodeData
           );
         }
 
-        const getFrom = fromNode.getBoundingClientRect();
-        const getTo = dragEndElement.getBoundingClientRect();
+        const getFrom = fromNode.getBoundingClientRect() as any
+        const getTo = dragEndElement.getBoundingClientRect() as any
 
         const updatedSx = parseFloat(getFrom.left + getFrom.width / 2);
         const updatedSy = parseFloat(getFrom.top + getFrom.height / 2);

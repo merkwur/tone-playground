@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import "./signal.scss"
 import Forms from '../instrument/form/forms'
-import { UnitParams } from '../../helper/types'
 // import { posY, posYMultiplier } from '../../helper/nodeHelpers'
 
 
@@ -16,7 +15,7 @@ interface SignalType {
           input: {},
           lines: [],
           params: {},
-          Tone: {} 
+          Tone: any 
       }
 }
 
@@ -58,7 +57,7 @@ const SignalTone: React.FC<SignalType> = ({name, node}) => {
   const [startNode, setStartNode] = useState<boolean>(false)
   const [nodeHeight, setNodeHeight] = useState<number>(0)
   const [isDragging, setIsDragging] = useState<boolean>(false)
-  const [signalValue, setSignalValue] = useState<number | string>(440)
+  const [signalValue, setSignalValue] = useState<number>(440)
   const [units, setUnits] = useState<string>("frequency")
   const [k, setK] = useState<string | null>(null)
   const [initialX, setInitialX] = useState<number>(0)
@@ -92,7 +91,7 @@ const SignalTone: React.FC<SignalType> = ({name, node}) => {
   }, [startNode])
 
 
-  const handleMouseDown = (event: MouseEvent, key: string) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, key: string) => {
     setInitialX(event.clientX)
     setIsDragging(true)
     setK(key)
@@ -101,7 +100,7 @@ const SignalTone: React.FC<SignalType> = ({name, node}) => {
   const handleMouseMove = (event: MouseEvent) => {
     if (isDragging) {
       const difference = event.clientX - initialX!
-      if (k.includes("signalValue")) {
+      if (k?.includes("signalValue")) {
         if (units === "audioRange") {
           setSignalValue(clamp(signalValue + difference*.01, -1, 1))
         }
@@ -184,8 +183,14 @@ const SignalTone: React.FC<SignalType> = ({name, node}) => {
     }
   };
 
-  const handleChange = (event: MouseEvent) => {
-    setUnits(event.target.value)
+  const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
+    if (event && 'target' in event) {
+     const target = event.target as any
+     if (target && "value" in target) {
+       const value = target.value as any
+       setUnits(value)
+     }
+    }
     
   }
 

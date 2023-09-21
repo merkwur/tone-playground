@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import "./component.scss"
 import Forms from '../instrument/form/forms'
-import { events } from '@react-three/fiber'
 
 interface ComponentType {
   name: string
@@ -14,7 +13,7 @@ interface ComponentType {
           input: {},
           lines: [],
           params: {},
-          Tone: {} 
+          Tone: any 
       }
 }
 
@@ -65,17 +64,17 @@ const initialStates = {
                         baseFrequency: {value: 263.6, min: 20, max: 1024, multiplier: .1, toneExtension: false},
 
 
-}                     
+} as any            
 
 
 
 const Component: React.FC<ComponentType> = ({name, node}) => {
   
   const [nodeHeight, setNodeHeight] = useState<number>(0)
-  const [state, setState] = useState<{}>(initialStates)
+  const [state, setState] = useState<{}>(initialStates) as any
 
   const [isDragging, setIsDragging] = useState<boolean>(false)
-  const [k, setK] = useState<string | null>(null)
+  const [k, setK] = useState<string>("frequency")
   const [initialX, setInitialX] = useState<number>(0)
 
 
@@ -88,7 +87,7 @@ const Component: React.FC<ComponentType> = ({name, node}) => {
   }, [])
 
 
-  const handleMouseDown = (event: MouseEvent, key: string) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, key: string) => {
     setInitialX(event.clientX)
     setIsDragging(true)
     setK(key)
@@ -104,14 +103,14 @@ const Component: React.FC<ComponentType> = ({name, node}) => {
       
       if (k?.includes("rolloff")) {
         const value = rolloffs[clamp(Math.floor(difference*.01) % rolloffs.length, 0, Infinity)]
-        setState((prevState) => ({
+        setState((prevState: any) => ({
           ...prevState,
           [k]: { ...prevState[k], value: value },
         }));
         handleNodeValueChange(value, k);
       } else {
           const clampedValue = clamp(state[k].value + difference * parameter.multiplier, parameter.min, parameter.max);
-          setState((prevState) => ({
+          setState((prevState: any) => ({
             ...prevState,
             [k]: { ...prevState[k], value: clampedValue },
           }));
@@ -140,19 +139,27 @@ const handleNodeValueChange = (value: number | string, type: string) => {
 }
 
 
-  const handleChange = (event: MouseEvent) => {
-    if (event?.target?.id === "attackCurve") {
-      handleNodeValueChange(event.target.value, "attackCurve")
-    }
-    if (event?.target?.id === "decayCurve") {
-
-      handleNodeValueChange(event.target.value, "decayCurve")
-    }
-    if (event?.target?.id === "releaseCurve") {
-      handleNodeValueChange(event.target.value, "releaseCurve")
-    }
-    if (event?.target?.id === "type") {
-      handleNodeValueChange(event.target.value, "type")
+const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
+  if (event && "target" in event) {
+      const target = event.target as any
+      if (target && "id" in target && "value" in target) {
+        const id = target.id as string
+        const value = target.value as string
+  
+          if (id === "attackCurve") {
+            handleNodeValueChange(value, "attackCurve")
+          }
+          if (id === "decayCurve") {
+      
+            handleNodeValueChange(value, "decayCurve")
+          }
+          if (id === "releaseCurve") {
+            handleNodeValueChange(value, "releaseCurve")
+          }
+          if (id === "type") {
+            handleNodeValueChange(value, "type")
+          }
+      }
     }
   }
 

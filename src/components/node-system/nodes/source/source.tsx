@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Nodes } from '../../helper/nodeData'
+import React, { ChangeEvent, MouseEvent, useEffect, useRef, useState } from 'react'
 import "./source.scss"
 
 interface SourceType {
@@ -10,14 +9,24 @@ interface SourceType {
           y: number,
           type: string,
           connectedTo: [],
-          input: [],
-          params: {},
-          lines: [],
-          Tone: {} 
+          input: string[],
+          params: {} | any,
+          lines: any[],
+          Tone: any 
       }
   }
 
-cosnt 
+// const initialStates = {
+//                         detune:           {value:  0,     min: -1200, max: 1200,  multiplier:  1               },
+//                         frequency:        {value:  263.6, min: 20,    max: 8192,  multiplier: .1               },
+//                         pitchDecay:       {value:  0,     min: 0,     max: 1,     multiplier: .001             },
+//                         harmonicity:      {value:  1,     min: .1,    max: 10,    multiplier: .001             },
+//                         octaves:          {value:  0,     min: 0,     max: 8,     multiplier: .001             },
+//                         resonance:        {value:  0,     min: 0,     max: 7000,  multiplier:  1               },
+//                         modulationIndex:  {value:  1,     min: 1,     max: 100,   multiplier:  1               },
+//                         dampening:        {value:  1,     min: 1,     max: 7000,  multiplier:  1               },
+                         
+// } 
 
 const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 const modulationTypes = ["sine", "square", "sawtooth", "triangle"]
@@ -62,11 +71,11 @@ const Source: React.FC<SourceType> = ({name, node}) => {
   }, [startOsc])
 
 
-  const handleDropdownChange = (event: MouseEvent) => {
+  const handleDropdownChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setWaveType(event.target?.value)
   }
 
-  const handleSourceChange = (event: MouseEvent) => {
+  const handleSourceChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSourceType(event.target?.value)
   }
 
@@ -90,42 +99,42 @@ const Source: React.FC<SourceType> = ({name, node}) => {
   }, [sourceType])
 
 
-  const handleMouseDown = (event: MouseEvent, key: string) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, key: string) => {
     setInitialX(event.clientX)
     setIsDragging(true)
     setK(key)
   }
 
-  const handleMouseMove = (event: MouseEvent) => {
+  const handleMouseMove = (event: MouseEvent | any) => {
     if (isDragging) {
       const difference = event.clientX - initialX!
-      if (k.includes("frequency")) {
+      if (k?.includes("frequency")) {
         if (name === "LFO") {
           setLfoFrequencyValue(clamp(lfoFrequencyValue + difference/100, .01, 10))  
         } else {
           setFrequencyValue(clamp(frequencyValue + difference*.1, 10, 12000))
         }
       }
-      if (k.includes("detune")) {
+      if (k?.includes("detune")) {
         setDetuneValue(clamp(Math.floor(detuneValue + difference), -1200, 1200))
       }
-      if (k.includes("harmonicity")) {
+      if (k?.includes("harmonicity")) {
         setHarmonicityValue(clamp(harmonicityValue + difference/100, .01, 10))
       }
-      if (k.includes("modulationType")) {
+      if (k?.includes("modulationType")) {
         setModulationType(modulationTypes[Math.floor(Math.abs(difference) / 50) % 4])
       }
-      if (k.includes("min")) {
+      if (k?.includes("min")) {
         setLfoMinValue(clamp(lfoMinValue + difference/100, .001, 10))
       }
       
-      if (k.includes("max")) {
+      if (k?.includes("max")) {
         setLfoMaxValue(clamp(Math.floor(lfoMaxValue + difference), lfoMinValue, 12000))
       }
-      if (k.includes("modulationIndex")) {
+      if (k?.includes("modulationIndex")) {
         setModulationIndex(clamp(modulationIndex + difference*.1, .1, 4000))
       }
-      if (k.includes("spread")) {
+      if (k?.includes("spread")) {
         setSpread(clamp(Math.floor(spread + difference), 1, 1199))
       }
       if (k?.includes("noiseType")) {
@@ -383,7 +392,7 @@ const Source: React.FC<SourceType> = ({name, node}) => {
 
                     <div
                         className={"slider"}
-                        onMouseDown={(event) => handleMouseDown(event, key)}
+                        onMouseDown={(event) => handleMouseDown(event as unknown as React.MouseEvent<HTMLDivElement, MouseEvent>, key)}
                         style={{
                           position: "absolute",
                           top: `${79 + 40 * index}px`,
@@ -417,7 +426,7 @@ const Source: React.FC<SourceType> = ({name, node}) => {
 
                     <div
                         className={"slider"}
-                        onMouseDown={(event) => handleMouseDown(event, key)}
+                        onMouseDown={(event) => handleMouseDown(event as unknown as React.MouseEvent<HTMLDivElement, MouseEvent>, key)}
                         style={{
                           position: "absolute",
                           top: `${48 + 40 * index}px`,
@@ -489,7 +498,7 @@ const Source: React.FC<SourceType> = ({name, node}) => {
           )}
           {Object.keys(node.params[sourceType]).map((key, index) => (
               <React.Fragment key={`input-${key}-${index}`}>
-                {name !== "Noise" ? (
+                {!name.includes("Noise") ? (
                   <>
                     <div
                         className='input'
@@ -508,7 +517,7 @@ const Source: React.FC<SourceType> = ({name, node}) => {
 
                     <div
                         className={"slider"}
-                        onMouseDown={(event) => handleMouseDown(event, key)}
+                        onMouseDown={(event) => handleMouseDown(event as unknown as React.MouseEvent<HTMLDivElement, MouseEvent>, key)}
                         style={{
                           position: "absolute",
                           top: `${79 + 40 * index}px`,
@@ -517,8 +526,8 @@ const Source: React.FC<SourceType> = ({name, node}) => {
                         key={`slider-${key}-${index}`}
                     >
                       <div className='inner-text' key={`inner-text-${key}-${index}`}>
-                        { key === "frequency" && name !== "LFO" ? frequencyValue.toFixed(3) :
-                          key === "frequency" && name === "LFO" ? lfoFrequencyValue.toFixed(3) :
+                        { key === "frequency" && !name.includes("LFO") ? frequencyValue.toFixed(3) :
+                          key === "frequency" && name.includes("LFO") ? lfoFrequencyValue.toFixed(3) :
                           key === "detune" ? detuneValue :
                           key === "harmonicity" ? harmonicityValue.toFixed(3) :
                           key === "min" ? lfoMinValue.toFixed(3) :
@@ -542,7 +551,7 @@ const Source: React.FC<SourceType> = ({name, node}) => {
 
                     <div
                         className={"slider"}
-                        onMouseDown={(event) => handleMouseDown(event, key)}
+                        onMouseDown={(event) => handleMouseDown(event as unknown as React.MouseEvent<HTMLDivElement, MouseEvent>, key)}
                         style={{
                           position: "absolute",
                           top: `${48 + 40 * index}px`,

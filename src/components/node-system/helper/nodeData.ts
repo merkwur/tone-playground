@@ -2,11 +2,20 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as Tone from "tone"
 import {ToneObjects,
-        OutputParams,
         NodeParams
        } from './types';
 
-
+export interface Lines {
+        id: string,
+        sx: number; 
+        sy: number; 
+        ex: number; 
+        ey: number;
+        from: string;
+        fromOutput: string,
+        to: string; 
+        toInput: string
+      }
 
 
 export interface Nodes {
@@ -15,26 +24,13 @@ export interface Nodes {
   x: number;
   y: number;
   type: string;
-  connectedTo: [];
-  input: [];
-  output: OutputParams,
+  connectedTo: string[];
+  input: string[];
+  output: any,
   params: NodeParams;
-  lines: [],
+  lines: Lines[] | null,
   ticks: number
   Tone: ToneObjects;
-}
-
-
-export interface Lines {
-  id: string,
-  sx: number; 
-  sy: number; 
-  ex: number; 
-  ey: number;
-  from: string;
-  fromOutput: string,
-  to: string; 
-  toInput: string
 }
 
 
@@ -42,17 +38,15 @@ export const nodes: Nodes[] = [];
 export const lines: Lines[] = [];
 
 
-
 export const addNode = (
   name: string,
   x: number,
   y: number,
   type: string,
-  connectedTo: [],
-  input: [],
-  output: OutputParams,
-  params: NodeParams | null = getDefaultParams(name),
-  lines: [],
+  connectedTo: string[],
+  output: any,
+  params: NodeParams | any = getDefaultParams(name),
+  lines: [] | null,
   nodes: Nodes[],
   ticks: number,
   Tone: ToneObjects | null = getToneObject(name),
@@ -98,9 +92,9 @@ export const updateNodePosition = (id: string, x: number, y: number, nodes: Node
 export const deleteNode = (idToDelete: string, nodes: Nodes[], lines: Lines[]): [Nodes[], Lines[]] => {
   const disposedElement = nodes.find((node) => node.id === idToDelete);
 
-  if (disposedElement?.name !== "Destination"  && disposedElement?.name !== "Transport") { 
+  if (disposedElement?.Tone.toneObject && disposedElement?.name !== "Destination"  && disposedElement?.name !== "Transport") { 
     disposedElement?.Tone.toneObject.dispose();
-  } else if (disposedElement.name === "Transport") {
+  } else if (disposedElement?.name === "Transport") {
     Tone.Transport.stop()
   }
 
@@ -131,8 +125,8 @@ export const addConnection = (from: string, to: string,
 
   if (connectionType === "node2node") {
     if (from.split(":")[0] !== "Transport") {
-      fromOutput = nodes.find((node) => node.id === from);
-      toInput = nodes.find((node) => node.id === to);
+      fromOutput = nodes.find((node) => node.id === from) as Nodes;
+      toInput = nodes.find((node) => node.id === to) as Nodes;
   
   
   
@@ -152,12 +146,14 @@ export const addConnection = (from: string, to: string,
           fromOutput?.Tone.toneObject.connect(toInput?.Tone.toneObject)
         }
       } else {
-        fromOutput?.Tone.toneObject.toDestination()
+        if (fromOutput?.Tone.toneObject) {
+          fromOutput?.Tone.toneObject.toDestination()
+        }
       }
       toInput?.input.push(fromOutput?.id)
     } else {
-        fromOutput = nodes.find((node) => node.id === from);
-        toInput = nodes.find((node) => node.id === to);
+      fromOutput = nodes.find((node) => node.id === from) as Nodes;
+      toInput = nodes.find((node) => node.id === to) as Nodes;
     
         if (!fromOutput || !toInput) {
           console.log('One or both of the nodes were not found.');
@@ -178,8 +174,8 @@ export const addConnection = (from: string, to: string,
   } else if (connectionType === "node2param") {
 
     console.log("here we are in node to param")
-    fromOutput = nodes.find((node) => node.id.split(":")[1] === from.split(":")[1]);
-    toInput = nodes.find((node) => node.id.split(":")[1] === to.split(":")[1]);
+    fromOutput = nodes.find((node) => node.id.split(":")[1] === from.split(":")[1]) as Nodes;
+    toInput = nodes.find((node) => node.id.split(":")[1] === to.split(":")[1]) as Nodes;
     
     console.log(from, fromOutput)
     console.log(to, toInput)
@@ -194,12 +190,16 @@ export const addConnection = (from: string, to: string,
       return nodes
     } 
 
-    fromOutput?.connectedTo.push(to)    
+    fromOutput?.connectedTo.push(to)
     toInput?.input.push(from)
-    if (to.includes("modulationIndex")) {
-      fromOutput.Tone.toneObject.connect(toInput.Tone.toneObject.modulationIndex)
-    } else {
-      fromOutput.Tone.toneObject.connect(toInput.Tone.toneObject[to.split(":")[0]])
+
+
+    if (fromOutput.Tone.toneObject && toInput.Tone.toneObject){
+      if (to.includes("modulationIndex")) {
+        fromOutput.Tone.toneObject.connect(toInput.Tone.toneObject.modulationIndex)
+      } else {
+        fromOutput.Tone.toneObject.connect(toInput.Tone.toneObject[to.split(":")[0]])
+      }
     }
   
   }
@@ -216,7 +216,7 @@ export const addConnection = (from: string, to: string,
   });
 
 
-  return updatedNodes;
+  return updatedNodes as Nodes[];
 };
 
 
@@ -228,7 +228,7 @@ const getDefaultParams = (nodeName: string): NodeParams | null => {
       return {gain: .5}
     case 'Oscillator':
       return { detune: 0, frequency: 263.61};
-    case "AMOscillator":
+          case "AMOscillator":
       return { detune: 0, frequency: 263.61, harmonicity: 1., modulationType: "sine"}
     case "FMOscillator":
       return { detune: 0, frequency: 263.61, harmonicity: 1., modulationIndex: 2., modulationType: "sine"}
@@ -623,8 +623,8 @@ export const deleteLine = (lineID: string, lines: Lines[], nodes: Nodes[]): [Lin
     return [lines, nodes];
   }
 
-  let fromNode;
-  let toNode;
+  let fromNode: any;
+  let toNode: any;
 
 
   const updatedNodes = nodes.map((node) => {

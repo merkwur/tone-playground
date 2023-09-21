@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import "./signal.scss"
-import Forms from '../instrument/form/forms'
-import { UnitParams } from '../../helper/types'
+
 // import { posY, posYMultiplier } from '../../helper/nodeHelpers'
 
 
@@ -15,8 +14,8 @@ interface SignalType {
           connectedTo: [],
           input: {},
           lines: [],
-          params: {},
-          Tone: {} 
+          params: any,
+          Tone: any 
       }
 }
 
@@ -78,7 +77,7 @@ const Signal: React.FC<SignalType> = ({name, node}) => {
   }, [startNode])
 
 
-  const handleMouseDown = (event: MouseEvent, key: string) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, key: string) => {
     setInitialX(event.clientX)
     setIsDragging(true)
     setK(key)

@@ -4,12 +4,12 @@ import React from 'react'
 interface FormsProps {
   id: string
   type: string
-  content: []
-  position: {top: number, left: number}
-  handleSourceChange: () => void
+  content: string[]
+  position: {top: number | string, left: number | string}
+  handleSourceChange: (event: React.ChangeEvent<HTMLSelectElement>) => void; // Change to React.ChangeEvent
 }
 
-const Forms = ({id, handleSourceChange, content, type, position}) => {
+const Forms: React.FC<FormsProps> = ({handleSourceChange, content, type, position}) => {
 
 
 
@@ -35,7 +35,7 @@ const Forms = ({id, handleSourceChange, content, type, position}) => {
                 backgroundColor: "#121212"
             }}
         >
-            {content.map((item, index) => (
+            {content.map((item) => (
               <option key={item} value={item}>
                   {item}
               </option>

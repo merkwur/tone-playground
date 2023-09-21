@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, {useState } from 'react';
 
 import "./node-canvas.scss"
 import SearchMenu from './helper/search-menu';
@@ -23,13 +23,13 @@ const NodeCanvasComponent = () => {
   const [nodesData, setNodesData] = useState<Nodes[]>([]);
   const [lineData, setLineData] = useState<Lines[]>([])
   const [menu, setMenu] = useState<boolean>(false)
-  const [type, setType] = useState<string | null>(null)
-  const [searchBoxPosition, setSearchBoxPosition] = useState<{x: number, y: number}>({})
-  const [time, setTime] = useState<number>()
-  const [runClock, setRunClock] = useState<boolean>(false)
+
+  const [searchBoxPosition, setSearchBoxPosition] = useState<{x: number, y: number}>({} as any)
+  
 
 
-  const handleAddNode = (name: string, type: string) => {
+
+  const handleAddNode = (name: string, type: string | null) => {
     // setType(type)
 
     if (name && type) {
@@ -39,8 +39,7 @@ const NodeCanvasComponent = () => {
                                        [],
                                        [],
                                        [],
-                                       null, 
-                                       [], 
+                                       null,  
                                        nodesData, 0); 
       setNodesData(updatedNodesData); 
       console.log(updatedNodesData)
@@ -52,7 +51,7 @@ const NodeCanvasComponent = () => {
     setMenu(false)
   }
 
-  const handleRightClick = (event: MouseEvent) => {
+  const handleRightClick: React.MouseEventHandler<HTMLDivElement> = (event) => {
     event.preventDefault()
     setMenu(true)
     setSearchBoxPosition({x: event.clientX, y: event.clientY})
@@ -62,7 +61,6 @@ const NodeCanvasComponent = () => {
   const handleNodeDelete = (idToDelete: string) => {
     console.log(idToDelete)
     if (idToDelete.includes("Clock")){
-      setRunClock(false)
     }
     const [updatedNodes, updatedLines] = deleteNode(idToDelete, nodesData, lineData); // Use the nodesData state to delete the node
     setNodesData(updatedNodes); // Update the component's state with the filtered nodes array
@@ -104,14 +102,14 @@ const NodeCanvasComponent = () => {
 
 
 
-  const handleSearchChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    const searchFieldString = event.currentTarget.value.toLowerCase();
-    const updatedSearch = nodesData.filter((item) => console.log(item))
-    if (event.key === 'Enter') {
-      console.log('Enter key pressed!');
-      setMenu(false);
-    }
-  };
+  // const handleSearchChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  //   // const searchFieldString = event.currentTarget.value.toLowerCase();
+  //   // const updatedSearch = nodesData.filter((item) => console.log(item))
+  //   if (event.key === 'Enter') {
+  //     console.log('Enter key pressed!');
+  //     setMenu(false);
+  //   }
+  // };
 
   const handleEnterKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
@@ -132,7 +130,7 @@ const NodeCanvasComponent = () => {
           >
           {menu ? (
             <SearchMenu 
-              handleChange={handleSearchChange}
+              // handleChange={handleSearchChange}
               handleEnterKeyPress={handleEnterKeyPress}
               position={searchBoxPosition}
               getInfo={(name, type) => handleAddNode(name, type)}

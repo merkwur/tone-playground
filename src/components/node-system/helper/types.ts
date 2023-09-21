@@ -1,5 +1,5 @@
 export type ToneObjects = {
-  toneObject: any;
+  toneObject: {[key: string]: any;} | null
 }
 
 type ClockParams = {

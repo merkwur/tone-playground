@@ -15,7 +15,7 @@ interface EffectsType {
           lines: [],
           params: {},
           ticks: 0,
-          Tone: {} 
+          Tone: any 
       }
 }
 
@@ -50,7 +50,7 @@ const initialStates = {
                         dampening:     {value: .5,    min: 0,      max: 1,    multiplier: .001 },
                         roomSize:      {value: .5,    min: 0,      max: 1,    multiplier: .001 },
                         decay:         {value: .78,   min: 0,      max: 1,    multiplier: .001 },
-}
+} as any
 
 
 
@@ -59,7 +59,6 @@ const Effects: React.FC<EffectsType> = ({name, node}) => {
   const [nodeHeight, setNodeHeight] = useState<number>(0)
   const [isDragging, setIsDragging] = useState<boolean>(false)
   const [k, setK] = useState<string | null>(null)
-  const [waveType, setWaveType] = useState<string>("sine")
   const [initialX, setInitialX] = useState<number>(0)
   const [state, setState] = useState(initialStates)
   const firstRender = useRef(false)
@@ -95,7 +94,7 @@ const Effects: React.FC<EffectsType> = ({name, node}) => {
   }, [])
 
 
-  const handleMouseDown = (event: MouseEvent, key: string) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, key: string) => {
     setInitialX(event.clientX)
     setIsDragging(true)
     setK(key)
@@ -112,7 +111,7 @@ const Effects: React.FC<EffectsType> = ({name, node}) => {
 
 
       
-      setState((prevState) => ({
+      setState((prevState: any) => ({
         ...prevState,
         [k]: { ...prevState[k], value: clampedValue },
       }));
@@ -134,9 +133,14 @@ const Effects: React.FC<EffectsType> = ({name, node}) => {
     }
 
 
-  const handleChange = (event: MouseEvent) => {
-    // setWaveType(event.target.value) 
-    handleNodeValueChange(event.target.value, "type")
+    const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
+      if (event && "target" in event) {
+      const target = event.target as any
+      if (target && "value" in target) {
+        const value = target.value as string
+        handleNodeValueChange(value, "type")
+      }
+    }
   }
 
 

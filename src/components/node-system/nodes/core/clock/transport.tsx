@@ -29,29 +29,30 @@ const keys = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 
 const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
-const Transport: React.FC<TransportType> = ({ name, node, nodes }) => {
+const Transport: React.FC<TransportType> = ({ node, nodes }) => {
   
-  const [nodeData, setNodesData] = useState<Nodes[]>([])
+
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [bpmValue, setBpmValue] = useState<number>(120);
   const [k, setK] = useState<string | number | null>(null);
   const [initialX, setInitialX] = useState<number>(0);
-  const [nodeHeight, setNodeHeight] = useState<number>(120);
+  const nodeHeight = useRef<number>(120);
   const [transportStart, setTransportStart] = useState<boolean>(false)
   const [tick, setTick] = useState<number>(0)
-  const [selectedKey, setSelectedKey] = useState<string>("C2")
 
   const [items, setItems] = useState([
-    { id: 0 }, { id: 1 }, { id: 2 }, { id: 3 },
-    { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }
+    { id: 0, x: 0, y: 0 }, { id: 1, x: 0, y: 0 }, { id: 2, x: 0, y: 0 }, { id: 3, x: 0, y: 0 },
+    { id: 4, x: 0, y: 0 }, { id: 5, x: 0, y: 0 }, { id: 6, x: 0, y: 0 }, { id: 7, x: 0, y: 0 }
   ]);
   const [sliders, setSliders] = useState([
-    { id: 0, value: 0 }, { id: 1, value: 0 }, { id: 2, value: 0 }, { id: 3, value: 0 },
-    { id: 4, value: 0 }, { id: 5, value: 0 }, { id: 6, value: 0 }, { id: 7, value: 0 }
+    { id: 0, value: 0, x: 0, y: 0 }, { id: 1, value: 0, x: 0, y: 0 }, 
+    { id: 2, value: 0, x: 0, y: 0 }, { id: 3, value: 0, x: 0, y: 0 },
+    { id: 4, value: 0, x: 0, y: 0 }, { id: 5, value: 0, x: 0, y: 0 }, 
+    { id: 6, value: 0, x: 0, y: 0 }, { id: 7, value: 0, x: 0, y: 0 }
   ]);
 
 
-  const [active, setActive] = useState<boolean>(false)
+  
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
   const [resultKeys, setResultKeys] = useState<string[]>([])
   
@@ -85,7 +86,8 @@ const Transport: React.FC<TransportType> = ({ name, node, nodes }) => {
   
   useEffect(() => {
     if (activeKeys.length > 0) {
-      updateResultKeys(activeKeys);
+      updateResultKeys(activeKeys as any);
+      console.log(resultKeys)
     } 
   }, [activeKeys, updateResultKeys]);
   
@@ -148,9 +150,10 @@ const Transport: React.FC<TransportType> = ({ name, node, nodes }) => {
         node.connectedTo.forEach((element) => {
           const matchingNode = nodes.find((n) => n.id === element);
           if (matchingNode) {
-            if (matchingNode.name !== "NoiseSynth") {
+            if (matchingNode.Tone.toneObject && matchingNode.name !== "NoiseSynth") {
+              
               matchingNode.Tone.toneObject.triggerAttackRelease(selectedKeyRef.current, 60 / bpmValue);
-            } else {
+            } else if (matchingNode.Tone.toneObject && matchingNode.name === "NoiseSynth") {
               matchingNode.Tone.toneObject.triggerAttackRelease(60 / bpmValue);
             }
           }
@@ -161,7 +164,9 @@ const Transport: React.FC<TransportType> = ({ name, node, nodes }) => {
         });
         
         envelopes.forEach((element) => {
-          element.Tone.toneObject.triggerAttackRelease(60 / bpmValue)
+          if (element.Tone.toneObject) {
+            element.Tone.toneObject.triggerAttackRelease(60 / bpmValue)
+          }
         })
 
   
@@ -178,7 +183,6 @@ const Transport: React.FC<TransportType> = ({ name, node, nodes }) => {
     
     const newKey = keys[keyIndex] + octave.toString()
     selectedKeyRef.current = newKey;
-    setSelectedKey(newKey)
 
   }, [tick])
 
@@ -194,7 +198,7 @@ const Transport: React.FC<TransportType> = ({ name, node, nodes }) => {
 
   // useEffect(() => {console.log(selectedKey)}, [selectedKey])
 
-  const handleMouseDown = (event: MouseEvent, key: string | number) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, key: string | number) => {
     setInitialX(event.clientX)
     setIsDragging(true)
     setK(key)
@@ -250,7 +254,7 @@ const Transport: React.FC<TransportType> = ({ name, node, nodes }) => {
     <>
     <div 
         className="transport-node-body"
-        style={{height: `${nodeHeight+60}px`}}
+        style={{height: `${nodeHeight}px`}}
         key={"Transport"+node.id}
         id={node.id}
       >
@@ -316,7 +320,7 @@ const Transport: React.FC<TransportType> = ({ name, node, nodes }) => {
               className='sequencer-content'
               style={{width: "100%"}}
           >       
-            {items.map((item, index) => (
+            {items.map((item) => (
               <div
               key={item.id}
               className={`item ${item.id === (tick - 1) % items.length ? "blink" : ""}`}
@@ -341,18 +345,18 @@ const Transport: React.FC<TransportType> = ({ name, node, nodes }) => {
           >
             <div className='piano'>
               <div className='keys'>
-                {renderKey('C')}
+                {renderKey('C', false)}
                 {renderKey('C#', true)}
-                {renderKey('D')}
+                {renderKey('D', false)}
                 {renderKey('D#', true)}
-                {renderKey('E')}
-                {renderKey('F')}
+                {renderKey('E', false)}
+                {renderKey('F', false)}
                 {renderKey('F#', true)}
-                {renderKey('G')}
+                {renderKey('G', false)}
                 {renderKey('G#', true)}
-                {renderKey('A')}
+                {renderKey('A', false)}
                 {renderKey('A#', true)}
-                {renderKey('B')}
+                {renderKey('B', false)}
               </div>
             </div>
           </div>

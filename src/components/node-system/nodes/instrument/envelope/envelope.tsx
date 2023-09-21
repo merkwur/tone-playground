@@ -1,16 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import "./envelope.scss"
-import { events } from '@react-three/fiber'
 
 interface EnvelopeProps {
   type: string
-  updateEnvelope: (value: number, type: string) => void
+  
 }
 
 
 const envelopeViewHeight = 70
 
-const Envelope: React.FC<EnvelopeProps> = ({type, updateEnvelope}) => {
+const Envelope: React.FC<EnvelopeProps> = ({type}) => {
 
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [initialX, setInitialX] = useState<number>(0);
@@ -19,10 +18,7 @@ const Envelope: React.FC<EnvelopeProps> = ({type, updateEnvelope}) => {
   const [decay, setDecay] = useState<number>(60)
   const [sustain, setSustain] = useState<number>(30)
   const [release, setRelease] = useState<number>(120)
-  const [nodeInitialPosition, setNodeInitialPosition] = useState<{
-    left: number;
-    top: number;
-  }>({ left: 0, top: 0 });
+
   const [whichKnob, setWhichKnob] = useState<HTMLElement | null>(null);
   const [parentWidth, setParentWidth] = useState<number>(0)
 
@@ -32,18 +28,6 @@ const Envelope: React.FC<EnvelopeProps> = ({type, updateEnvelope}) => {
     const knobElement = event.currentTarget;
     setWhichKnob(knobElement);
 
-    const clientRect = knobElement.getBoundingClientRect();
-    const diffX = event.clientX - clientRect.left;
-    const diffY = event.clientY - clientRect.top;
-
-    const parentElement = document.querySelector(`.synth-node-body`);
-    if (parentElement) {
-      const parentRect = parentElement.getBoundingClientRect();
-      setNodeInitialPosition({
-        left: parentRect.left,
-        top: parentRect.top,
-      });
-    }
 
     setInitialX(event.clientX);
     setInitialY(event.clientY);
@@ -52,7 +36,10 @@ const Envelope: React.FC<EnvelopeProps> = ({type, updateEnvelope}) => {
 
   useEffect(() => {
     const outputElement = document.querySelector('.envelope-container');
-    setParentWidth(parseInt(outputElement?.parentElement?.parentElement?.parentElement.style.width, 10))
+    if (outputElement?.parentElement?.parentElement?.parentElement) {
+      const pWidth = parseInt(outputElement?.parentElement?.parentElement?.parentElement.style.width, 10) 
+      setParentWidth(pWidth)
+    }
   }, []);
 
   const handleMouseMove = (event: MouseEvent) => {
@@ -66,25 +53,25 @@ const Envelope: React.FC<EnvelopeProps> = ({type, updateEnvelope}) => {
         if (whichKnob?.className === 'attack') {
           const newAttack = attack + diffX;
           setAttack(newAttack);
-          updateEnvelope(newAttack, "attack")
+          // updateEnvelope(newAttack, "attack")
           whichKnob.style.left = `${newAttack}px`;
         }
         if (whichKnob?.className === 'decay') {
           const newDecay = decay + diffX;
           setDecay(newDecay);
-          updateEnvelope(newDecay, "decay")
+          // updateEnvelope(newDecay, "decay")
           whichKnob.style.left = `${newDecay}px`;
         }
         if (whichKnob?.className === 'release') {
           const newRelease = release + diffX;
           setRelease(newRelease);
-          updateEnvelope(newRelease, "release")
+          // updateEnvelope(newRelease, "release")
           whichKnob.style.left = `${newRelease}px`;
         }
       } else {
         const newSustain = sustain + diffY;
         setSustain(newSustain);
-        updateEnvelope(newSustain, "sustain")
+        // updateEnvelope(newSustain, "sustain")
         whichKnob.style.top = `${newSustain}px`;
       }
     }

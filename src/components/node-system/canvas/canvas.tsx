@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Curves from "./curves";
-import { Lines } from "../node-system/helper/nodeData";
+import { Lines } from "../helper/nodeData";
+
 
 
 interface CurveProps {

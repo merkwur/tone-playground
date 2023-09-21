@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import Forms from '../instrument/form/forms'
 import Envelope from '../instrument/envelope/envelope'
-import { NodeParam } from '../../helper/nodeData'
+
 import "./synth.scss"
+import { NodeParams } from '../../helper/types'
 
 interface SynthType {
   name: string
@@ -14,34 +15,24 @@ interface SynthType {
           connectedTo: [],
           input: {},
           lines: [],
-          params: NodeParam,
-          Tone: {} 
+          params: NodeParams | any,
+          Tone: any 
       }
-      lines: {
-          sx: number, 
-          sy: number,
-          ex: number,
-          ey: number, 
-          from: string,
-          to: string,
-          fromOutput: string,
-          toInput: string
-      } | null
       
 }
 
 const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
-const posY = 80
+// const posY = 80
 const sourcekey = ["so", "am", "fm", "fat", "pwm", "pulse"]
-const sourcekeyHeader = ["SimpleOsc", "AMOsc", "FMOsc", "FatOsc", "PWMOsc", "PulseOsc"]
+// const sourcekeyHeader = ["SimpleOsc", "AMOsc", "FMOsc", "FatOsc", "PWMOsc", "PulseOsc"]
 const wavekey = ["sine", "square", "sawtooth", "tringle"]
-const curveType = [ "linear",
-                    "exponential",
-                    "sine",
-                    "cosine",
-                    "bounce",
-                    "ripple",
-                    "step"]
+// const curveType = [ "linear",
+//                     "exponential",
+//                     "sine",
+//                     "cosine",
+//                     "bounce",
+//                     "ripple",
+//                     "step"]
 const excludes = ["MembraneSynth", "MetalSynth", "NoiseSynth"]
 
 const initialStates = { 
@@ -62,14 +53,14 @@ const initialStates = {
                         attackCurve :     {value: "linear"},
                         decayCurve :      {value: "linear"},
                         releaseCurve :    {value: "linear"},
-                      }
+                      } as any
 
 
-const Synth: React.FC<SynthType> = ({name, node, lines}) => {
+const Synth: React.FC<SynthType> = ({name, node}) => {
   const [nodeHeight, setNodeHeight] = useState<number>(0)
   const [isDragging, setIsDragging] = useState<boolean>(false)
   const [initialX, setInitialX] = useState<number>(0)
-  const [state, setState] = useState<{}>(initialStates)
+  const [state, setState] = useState<{}>(initialStates) as any
   const [oscillatorType, setOscillatorType] = useState<string>("so")
   const [k, setK] = useState<string | null>(null)
   
@@ -85,17 +76,21 @@ const Synth: React.FC<SynthType> = ({name, node, lines}) => {
 
 
 
-  const handleEnvelopeChange = (value: number, type: string) => {
+  // const handleEnvelopeChange = (value: number, type: string) => {
 
-  }
+  // }
 
-  const handleChange = (event: MouseEvent) => {
-
-    setOscillatorType(event.target.value)
+  const handleChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
+    if (event && "target" in event) {
+      const target = event.target as any
+      if (target) {
+        setOscillatorType(target.value)
+      }
+    }
     
   }
 
-  const handleMouseDown = (event: MouseEvent, key: string) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, key: string) => {
     setInitialX(event.clientX)
     setIsDragging(true)
     setK(key)
@@ -105,19 +100,20 @@ const Synth: React.FC<SynthType> = ({name, node, lines}) => {
 
   const handleMouseMove = (event: MouseEvent) => {
     
-    if (isDragging) {
+    if (isDragging && k) {
       const difference = event.clientX - initialX!
       const parameter = initialStates[k]
-      if (!k === "type") {
+
+      if (!k?.includes("type")) {
         const clampedValue = clamp(state[k].value + difference * parameter.multiplier, parameter.min, parameter.max);
-        setState((prevState) => ({
+        setState((prevState: any) => ({
           ...prevState,
           [k]: { ...prevState[k], value: clampedValue },
         }));
         handleNodeValueChange(clampedValue, k);
       } else {
         const selectedValue = state[k].types[clamp(Math.floor(difference * parameter.multiplier) % state[k].types.length, 0, state[k].types.length)];
-        setState((prevState) => ({
+        setState((prevState: any) => ({
           ...prevState,
           [k]: { ...prevState[k], value: selectedValue },
         }));
@@ -136,7 +132,7 @@ const Synth: React.FC<SynthType> = ({name, node, lines}) => {
   const handleNodeValueChange = (val: number | string, type: string) => {
     console.log(val, type)
     if (node.name !== "NoiseSynth") {
-      if (node.Tone.toneObject[type].hasOwnProperty(value)) {
+      if (node.Tone.toneObject[type].hasOwnProperty(val)) {
           node.Tone.toneObject[type].value = val
         } else {
           node.Tone.toneObject[type] = val
@@ -244,7 +240,7 @@ const Synth: React.FC<SynthType> = ({name, node, lines}) => {
           />
           <Envelope 
               type='synth'
-              updateEnvelope = {(value, type) => handleEnvelopeChange(value, type)}
+              // updateEnvelope = {(value, type) => handleEnvelopeChange(value, type)}
               />
         </div>
         <div 

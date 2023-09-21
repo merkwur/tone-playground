@@ -11,8 +11,8 @@ interface CoreType {
           connectedTo: [],
           input: {},
           lines: [],
-          params: {},
-          Tone: {} 
+          params: any,
+          Tone: any 
       }
 }
 
@@ -36,7 +36,7 @@ const Core: React.FC<CoreType> = ({name, node}) => {
   }, [])
 
 
-  const handleMouseDown = (event: MouseEvent, key: string) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, key: string) => {
     setInitialX(event.clientX)
     setIsDragging(true)
     setK(key)
@@ -45,7 +45,7 @@ const Core: React.FC<CoreType> = ({name, node}) => {
   const handleMouseMove = (event: MouseEvent) => {
     if (isDragging) {
       const difference = event.clientX - initialX!
-      if (k.includes("gain")) {
+      if (k?.includes("gain")) {
         setGainValue(clamp(gainValue + difference*.001, 0, 1))
       }
     }
