@@ -5,6 +5,8 @@ Easy to develop synthesizer on a browser. Highly influenced by VCV Rack
 
 ## How to Play
 
+[Tone Playground](https://merkwur.github.io/)
+
  - *Right-click on a canvas to open a menu*
  - *Left click on an element on the menu selects and creates the node from the element*
  - *In order to create a sound one must create a destination node. The destination node must be the last element in the tree. And must have a connection. A single connection is better than multiple connections. To handle the multiple connections use the gain node*
