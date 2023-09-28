@@ -19,7 +19,7 @@ Easy to develop synthesizer on a browser. Highly influenced by VCV Rack
 
  - Panning, zooming interface, grouping nodes. 
  - Color picking for the connections.
- - Establish a connection from input to output. -Now only connection can be created from output to input drag and drop-
+ - Establish a connection from input to output. -Now connection can only be created from output to input drag and drop-
  - Showing the lines while dragging. -Now, the line only becomes visible when the connection is valid. It has the advantage of not seeing the edges between the nodes unless there is a connection, however, it can be solved more visually plausible manner-
  - There is an issue with the Tone Transport node. It should be easy to fix or need to create a new clock system. 
  - An Envelope component has missing functionality. On-graph value manipulation is pretty much in need. Later, animation of the value passing through the envelope.
