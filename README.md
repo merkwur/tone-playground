@@ -16,8 +16,10 @@ Easy to develop synthesizer on a browser. Highly influenced by VCV Rack
  - *There are minor and major multiple bugs that exist* 
 
 ## To-Do
-
- - There is an issue with the Transport. It should be easy to fix or need to create a new clock system. 
+ - Color picking for the connections.
+ - Establish a connection from input to output. -Now only connection can be created from output to input drag and drop-
+ - Showing the lines while dragging. -Now, the line only becomes visible when the connection is valid. It has the advantage of not seeing the edges between the nodes unless there is a connection, however, it can be solved more visually plausible manner-
+ - There is an issue with the Tone Transport node. It should be easy to fix or need to create a new clock system. 
  - An Envelope component has missing functionality. On-graph value manipulation is pretty much in need. Later, animation of the value passing through the envelope.
  - Waveform and FFT visualizers. Waveform also should support the Lissajous curves.
  - Each node section needs to be redesigned according to easy-to-use UI/UX
