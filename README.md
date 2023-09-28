@@ -16,6 +16,8 @@ Easy to develop synthesizer on a browser. Highly influenced by VCV Rack
  - *There are minor and major multiple bugs that exist* 
 
 ## To-Do
+
+ - Panning, zooming interface, grouping nodes. 
  - Color picking for the connections.
  - Establish a connection from input to output. -Now only connection can be created from output to input drag and drop-
  - Showing the lines while dragging. -Now, the line only becomes visible when the connection is valid. It has the advantage of not seeing the edges between the nodes unless there is a connection, however, it can be solved more visually plausible manner-
